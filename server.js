@@ -16,28 +16,28 @@ const staticProducts = {
             title: "تيشيرت قطني رجالي أنيق",
             price: "15.00 USD",
             image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500",
-            affiliate_url: "https://rzekl.com/g/1e8d114494115aeb5a6816525dc3e8/?ulp=https%3A%2F%2Fwww.aliexpress.com%2Fitem%2F1005005886367353.html"
+            affiliate_url: "https://rzekl.com/g/1e8d114494115aeb5a6816525dc3e8/?ulp=https%3A%2F%2Fwww.aliexpress.com%2Fwholesale%3FSearchText%3Dmens%2Btshirt"
         },
         {
             id: "m2",
             title: "حذاء رياضي مريح للرجال",
             price: "35.00 USD",
             image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500",
-            affiliate_url: "https://rzekl.com/g/1e8d114494115aeb5a6816525dc3e8/?ulp=https%3A%2F%2Fwww.aliexpress.com%2Fitem%2F1005006093845012.html"
+            affiliate_url: "https://rzekl.com/g/1e8d114494115aeb5a6816525dc3e8/?ulp=https%3A%2F%2Fwww.aliexpress.com%2Fwholesale%3FSearchText%3Dsneakers%2Bmen"
         },
         {
             id: "m3",
             title: "قميص كلاسيكي رجالي فاخر",
             price: "30.00 USD",
             image: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500",
-            affiliate_url: "https://rzekl.com/g/1e8d114494115aeb5a6816525dc3e8/?ulp=https%3A%2F%2Fwww.aliexpress.com%2Fitem%2F1005005187123984.html"
+            affiliate_url: "https://rzekl.com/g/1e8d114494115aeb5a6816525dc3e8/?ulp=https%3A%2F%2Fwww.aliexpress.com%2Fwholesale%3FSearchText%3Dclassic%2Bshirt%2Bmen"
         },
         {
             id: "m4",
             title: "ساعة يد كلاسيكية للرجال",
             price: "85.00 USD",
             image: "https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?w=500",
-            affiliate_url: "https://rzekl.com/g/1e8d114494115aeb5a6816525dc3e8/?ulp=https%3A%2F%2Fwww.aliexpress.com%2Fitem%2F1005006129845719.html"
+            affiliate_url: "https://rzekl.com/g/1e8d114494115aeb5a6816525dc3e8/?ulp=https%3A%2F%2Fwww.aliexpress.com%2Fwholesale%3FSearchText%3Dwatch%2Bmen"
         }
     ],
     women: [
@@ -46,28 +46,28 @@ const staticProducts = {
             title: "فستان صيفي أنيق",
             price: "25.00 USD",
             image: "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=500",
-            affiliate_url: "https://rzekl.com/g/1e8d114494115aeb5a6816525dc3e8/?ulp=https%3A%2F%2Fwww.aliexpress.com%2Fitem%2F1005005928123948.html"
+            affiliate_url: "https://rzekl.com/g/1e8d114494115aeb5a6816525dc3e8/?ulp=https%3A%2F%2Fwww.aliexpress.com%2Fwholesale%3FSearchText%3Dsummer%2Bdress"
         },
         {
             id: "w2",
             title: "حقيبة يد جلدية فاخرة للنساء",
             price: "45.00 USD",
             image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=500",
-            affiliate_url: "https://rzekl.com/g/1e8d114494115aeb5a6816525dc3e8/?ulp=https%3A%2F%2Fwww.aliexpress.com%2Fitem%2F1005005938401293.html"
+            affiliate_url: "https://rzekl.com/g/1e8d114494115aeb5a6816525dc3e8/?ulp=https%3A%2F%2Fwww.aliexpress.com%2Fwholesale%3FSearchText%3Dhandbag%2Bwomen"
         },
         {
             id: "w3",
             title: "نظارات شمسية عصرية للنساء",
             price: "18.00 USD",
             image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=500",
-            affiliate_url: "https://rzekl.com/g/1e8d114494115aeb5a6816525dc3e8/?ulp=https%3A%2F%2Fwww.aliexpress.com%2Fitem%2F1005005829384712.html"
+            affiliate_url: "https://rzekl.com/g/1e8d114494115aeb5a6816525dc3e8/?ulp=https%3A%2F%2Fwww.aliexpress.com%2Fwholesale%3FSearchText%3Dsunglasses%2Bwomen"
         },
         {
             id: "w4",
             title: "حذاء نسائي أنيق ذو كعب عالٍ",
             price: "50.00 USD",
             image: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=500",
-            affiliate_url: "https://rzekl.com/g/1e8d114494115aeb5a6816525dc3e8/?ulp=https%3A%2F%2Fwww.aliexpress.com%2Fitem%2F1005006012984712.html"
+            affiliate_url: "https://rzekl.com/g/1e8d114494115aeb5a6816525dc3e8/?ulp=https%3A%2F%2Fwww.aliexpress.com%2Fwholesale%3FSearchText%3Dhigh%2Bheels"
         }
     ]
 };
