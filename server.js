@@ -73,11 +73,11 @@ const staticProducts = {
 };
 
 app.get('/api/products', async (req, res) => {
-    // نضع مهلة زمنية أطول (8 ثوانٍ) لطلب Admitad، لإعطائه فرصة كافية للتحميل دون تعليق
+    // نضع مهلة زمنية قصيرة (ثانيتين) لطلب Admitad، لإعطائه فرصة كافية دون إبطاء الاستجابة للموبايل
     const source = axios.CancelToken.source();
     const timeout = setTimeout(() => {
         source.cancel('Timeout');
-    }, 8000);
+    }, 2000);
 
     try {
         const response = await axios.get(ADMITAD_XML_FEED, {
