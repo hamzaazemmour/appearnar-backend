@@ -9,30 +9,40 @@ app.use(express.json());
 
 const ADMITAD_XML_FEED = "http://export.admitad.com/en/webmaster/websites/2959524/products/export_adv_products/?user=hamza_benlhocenecbef&code=wd1n174woy&feed_id=15830&format=xml&fcid=6115";
 
-// قائمة منتجات ذكية وجاهزة للعمل فوراً كخطة أساسية وسريعة للتطبيق
-const staticProducts = [
-    {
-        id: "ali_101",
-        title: "سماعات بلوتوث Lenovo LP40 Pro اللاسلكية الأصلية",
-        price: "12.50 USD",
-        image: "https://images.unsplash.com/photo-1606220532402-13a1e8223946?w=500",
-        affiliate_url: "https://rzekl.com/g/1e8d114494115aeb5a6816525dc3e8/"
-    },
-    {
-        id: "ali_102",
-        title: "ساعة ذكية Smart Watch مقاومة للماء مع شاشة أموليد",
-        price: "24.99 USD",
-        image: "https://images.unsplash.com/photo-1542496658-e33a6d0d50f6?w=500",
-        affiliate_url: "https://rzekl.com/g/1e8d114494115aeb5a6816525dc3e8/"
-    },
-    {
-        id: "ali_103",
-        title: "شاحن سريع Baseus 65W GaN لأجهزة الأندرويد والآيفون",
-        price: "19.99 USD",
-        image: "https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=500",
-        affiliate_url: "https://rzekl.com/g/1e8d114494115aeb5a6816525dc3e8/"
-    }
-];
+const staticProducts = {
+    men: [
+        {
+            id: "m1",
+            title: "تيشيرت قطني رجالي أنيق",
+            price: "15.00 USD",
+            image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500",
+            affiliate_url: "https://rzekl.com/g/1e8d114494115aeb5a6816525dc3e8/"
+        },
+        {
+            id: "m2",
+            title: "حذاء رياضي مريح للرجال",
+            price: "35.00 USD",
+            image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500",
+            affiliate_url: "https://rzekl.com/g/1e8d114494115aeb5a6816525dc3e8/"
+        }
+    ],
+    women: [
+        {
+            id: "w1",
+            title: "فستان صيفي أنيق",
+            price: "25.00 USD",
+            image: "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=500",
+            affiliate_url: "https://rzekl.com/g/1e8d114494115aeb5a6816525dc3e8/"
+        },
+        {
+            id: "w2",
+            title: "حقيبة يد جلدية فاخرة للنساء",
+            price: "45.00 USD",
+            image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=500",
+            affiliate_url: "https://rzekl.com/g/1e8d114494115aeb5a6816525dc3e8/"
+        }
+    ]
+};
 
 app.get('/api/products', async (req, res) => {
     // نضع مهلة زمنية قصيرة (3 ثوانٍ فقط) لطلب Admitad، إذا علق نلغيه فوراً ونعرض المنتجات السريعة
@@ -59,15 +69,35 @@ app.get('/api/products', async (req, res) => {
                 return res.json({ success: true, live: false, products: staticProducts });
             }
 
-            const products = itemsArray.map(item => ({
-                id: item.id || Math.random().toString(36).substr(2, 9),
-                title: item.name || item.model || "AliExpress Product",
-                price: `${item.price || ""} ${item.currencyId || "USD"}`,
-                image: Array.isArray(item.picture) ? item.picture[0] : (item.picture || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500"),
-                affiliate_url: item.url || "https://rzekl.com/g/1e8d114494115aeb5a6816525dc3e8/"
-            })).slice(0, 30);
+            const men = [];
+            const women = [];
 
-            res.json({ success: true, live: true, count: products.length, products: products });
+            itemsArray.forEach(item => {
+                const product = {
+                    id: item.id || Math.random().toString(36).substr(2, 9),
+                    title: item.name || item.model || "AliExpress Product",
+                    price: `${item.price || ""} ${item.currencyId || "USD"}`,
+                    image: Array.isArray(item.picture) ? item.picture[0] : (item.picture || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500"),
+                    affiliate_url: item.url || "https://rzekl.com/g/1e8d114494115aeb5a6816525dc3e8/"
+                };
+
+                const text = (product.title + " " + (item.description || "")).toLowerCase();
+                if (text.includes("women") || text.includes("woman") || text.includes("girl") || text.includes("نسائي") || text.includes("فستان") || text.includes("حريمي") || text.includes("بنات")) {
+                    women.push(product);
+                } else {
+                    men.push(product);
+                }
+            });
+
+            res.json({
+                success: true,
+                live: true,
+                count: men.length + women.length,
+                products: {
+                    men: men.slice(0, 20),
+                    women: women.slice(0, 20)
+                }
+            });
         });
 
     } catch (error) {
