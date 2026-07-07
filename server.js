@@ -1,47 +1,53 @@
 const express = require('express');
+const cors = require('cors');
 const axios = require('axios');
 const xml2js = require('xml2js');
-const cors = require('cors');
 
 const app = express();
 app.use(cors());
+app.use(express.json());
 
-// رابط الـ XML الخاص بك مباشرة
-const XML_URL = "http://export.admitad.com/en/webmaster/websites/2959524/products/export_adv_products/?user=hamza_benlhocenecbef&code=wd1n174woy&feed_id=15830&format=xml&fcid=6115";
+// رابط الـ XML الخاص بك من Admitad لجلب منتجات AliExpress
+const ADMITAD_XML_FEED = "http://export.admitad.com/en/webmaster/websites/2959524/products/export_adv_products/?user=hamza_benlhocenecbef&code=wd1n174woy&feed_id=15830&format=xml&fcid=6115";
 
 app.get('/api/products', async (req, res) => {
     try {
-        // جلب البيانات من ملف الـ XML مباشرة دون الحاجة لـ Token (يتفادى خطأ 401)
-        const response = await axios.get(XML_URL);
+        // 1. جلب بيانات المنتجات من Admitad
+        const response = await axios.get(ADMITAD_XML_FEED);
         
-        // تحويل الـ XML إلى JSON
-        xml2js.parseString(response.data, (err, result) => {
+        // 2. تحويل الـ XML إلى كود JSON بسيط ليفهمه تطبيق الأندرويد
+        xml2js.parseString(response.data, { explicitArray: false }, (err, result) => {
             if (err) {
-                return res.status(500).json({ error: "خطأ في تحليل البيانات" });
+                return res.status(500).json({ success: false, message: "Error parsing XML feed" });
             }
-            
-            // استخراج العروض
-            const offers = result.vxml.shop[0].offers[0].offer || [];
-            
-            // نأخذ أول 100 منتج لتخفيف الضغط
-            const limitedOffers = offers.slice(0, 100).map(offer => ({
-                name: offer.name ? offer.name[0] : "منتج مميز",
-                picture: offer.picture ? offer.picture[0] : "",
-                price: offer.price ? offer.price[0] : "",
-                currency: offer.currencyId ? offer.currencyId[0] : "USD",
-                url: offer.url ? offer.url[0] : "https://rzekl.com/g/1e8d114494115aeb5a6816525dc3e8/"
-            }));
 
-            res.json(limitedOffers);
+            // قراءة قائمة المنتجات من هيكلة الملف (تعتمد على تنسيق Admitad)
+            // عادة تكون داخل result.yml_catalog.shop.offers.offer أو ما يشابهها
+            const offers = result?.yml_catalog?.shop?.offers?.offer || [];
+            
+            // ترتيب البيانات لتكون نظيفة وخفيفة للتطبيق
+            const products = (Array.isArray(offers) ? offers : [offers]).map(item => ({
+                id: item.$.id || "",
+                title: item.name || item.model || "AliExpress Product",
+                price: `${item.price || ""} ${item.currencyId || "USD"}`,
+                image: item.picture || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500", // صورة افتراضية إن لم تتوفر
+                affiliate_url: item.url || "https://rzekl.com/g/1e8d114494115aeb5a6816525dc3e8/" // رابط عمولتك الافتراضي
+            })).slice(0, 50); // جلب أول 50 منتجاً لتسريع التطبيق
+
+            res.json({
+                success: true,
+                count: products.length,
+                products: products
+            });
         });
+
     } catch (error) {
-        console.error("خطأ السيرفر:", error.message);
-        res.status(500).json({ error: "فشل الاتصال بـ Admitad" });
+        res.status(500).json({ success: false, error: error.message });
     }
 });
 
-// التعديل السحابي هنا: يقرأ المنفذ المخصص من الاستضافة أو يستخدم 3000 محلياً
+// تشغيل السيرفر
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`🚀 السيرفر الخلفي يعمل بنجاح على المنفذ ${PORT}`);
+    console.log(`Server is running on port ${PORT}`);
 });
