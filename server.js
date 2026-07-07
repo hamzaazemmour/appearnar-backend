@@ -7,32 +7,47 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// رابط الـ XML الخاص بك من Admitad لجلب منتجات AliExpress
 const ADMITAD_XML_FEED = "http://export.admitad.com/en/webmaster/websites/2959524/products/export_adv_products/?user=hamza_benlhocenecbef&code=wd1n174woy&feed_id=15830&format=xml&fcid=6115";
 
 app.get('/api/products', async (req, res) => {
     try {
-        // 1. جلب بيانات المنتجات من Admitad
-        const response = await axios.get(ADMITAD_XML_FEED);
+        // جلب البيانات مع إضافة User-Agent لتجنب حظر السيرفرات
+        const response = await axios.get(ADMITAD_XML_FEED, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            },
+            timeout: 10000 // مهلة 10 ثوانٍ للاتصال
+        });
         
-        // 2. تحويل الـ XML إلى كود JSON بسيط ليفهمه تطبيق الأندرويد
-        xml2js.parseString(response.data, { explicitArray: false }, (err, result) => {
+        xml2js.parseString(response.data, { explicitArray: false, mergeAttrs: true }, (err, result) => {
             if (err) {
-                return res.status(500).json({ success: false, message: "Error parsing XML feed" });
+                return res.status(500).json({ success: false, message: "Error parsing XML feed", error: err.message });
             }
 
-            // قراءة قائمة المنتجات من هيكلة الملف (تعتمد على تنسيق Admitad)
-            // عادة تكون داخل result.yml_catalog.shop.offers.offer أو ما يشابهها
-            const offers = result?.yml_catalog?.shop?.offers?.offer || [];
+            // فحص مرن وتدريجي لهيكلة ملف Admitad لتجنب الانهيار
+            const catalog = result?.yml_catalog || result?.feed;
+            const shop = catalog?.shop;
+            const offersContainer = shop?.offers;
+            const offers = offersContainer?.offer || [];
             
-            // ترتيب البيانات لتكون نظيفة وخفيفة للتطبيق
-            const products = (Array.isArray(offers) ? offers : [offers]).map(item => ({
-                id: item.$.id || "",
-                title: item.name || item.model || "AliExpress Product",
-                price: `${item.price || ""} ${item.currencyId || "USD"}`,
-                image: item.picture || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500", // صورة افتراضية إن لم تتوفر
-                affiliate_url: item.url || "https://rzekl.com/g/1e8d114494115aeb5a6816525dc3e8/" // رابط عمولتك الافتراضي
-            })).slice(0, 50); // جلب أول 50 منتجاً لتسريع التطبيق
+            // تحويل البيانات بشكل آمن
+            const itemsArray = Array.isArray(offers) ? offers : [offers];
+            
+            const products = itemsArray.filter(item => item).map(item => {
+                // جلب الصورة بشكل آمن (قد تكون نصاً مباشرًا أو مصفوفة)
+                let image = "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500";
+                if (item.picture) {
+                    image = Array.isArray(item.picture) ? item.picture[0] : item.picture;
+                }
+
+                return {
+                    id: item.id || Math.random().toString(36).substr(2, 9),
+                    title: item.name || item.model || "AliExpress Product",
+                    price: `${item.price || ""} ${item.currencyId || "USD"}`,
+                    image: image,
+                    affiliate_url: item.url || "https://rzekl.com/g/1e8d114494115aeb5a6816525dc3e8/"
+                };
+            }).slice(0, 50); // جلب أول 50 منتجاً فقط لتسريع الأداء
 
             res.json({
                 success: true,
@@ -42,7 +57,28 @@ app.get('/api/products', async (req, res) => {
         });
 
     } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
+        // في حال فشل جلب الـ XML، نرسل منتجات احتياطية كخطة بديلة (Fallback) حتى لا يعلق التطبيق
+        res.json({
+            success: true,
+            fallback: true,
+            message: "Showing fallback products due to feed timeout",
+            products: [
+                {
+                    id: "fb1",
+                    title: "سماعات بلوتوث لاسلكية ذكية عالية الجودة - AliExpress",
+                    price: "15.99 USD",
+                    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500",
+                    affiliate_url: "https://rzekl.com/g/1e8d114494115aeb5a6816525dc3e8/"
+                },
+                {
+                    id: "fb2",
+                    title: "ساعة يد ذكية مقاومة للماء مع مستشعر نبضات - AliExpress",
+                    price: "29.49 USD",
+                    image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500",
+                    affiliate_url: "https://rzekl.com/g/1e8d114494115aeb5a6816525dc3e8/"
+                }
+            ]
+        });
     }
 });
 
